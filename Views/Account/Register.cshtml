@@ -1,0 +1,135 @@
+﻿@model FarmaDual.Models.ViewModels.RegisterVM
+@{
+    ViewBag.Title = "Registro";
+}
+
+<div class="container mt-4" style="max-width: 900px;">
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <h3 class="mb-4">Registro</h3>
+
+            @using (Html.BeginForm("Register", "Account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Correo, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Correo,
+                            new { @class = "form-control", type = "email", autocomplete = "username" })
+                        @Html.ValidationMessageFor(m => m.Correo, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-3">
+                        @Html.LabelFor(m => m.Password, new { @class = "form-label" })
+                        @Html.PasswordFor(m => m.Password,
+                            new { @class = "form-control", autocomplete = "new-password" })
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-3">
+                        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label" })
+                        @Html.PasswordFor(m => m.ConfirmPassword,
+                            new { @class = "form-control", autocomplete = "new-password" })
+                        @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Identificacion, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Identificacion, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Identificacion, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.NombreCompleto, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.NombreCompleto, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.NombreCompleto, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-3">
+                        @Html.LabelFor(m => m.Genero, new { @class = "form-label" })
+                        @Html.DropDownListFor(m => m.Genero,
+                            new SelectList(new[] {
+                                new { Value = "", Text = "--" },
+                                new { Value = "M", Text = "Masculino" },
+                                new { Value = "F", Text = "Femenino" }
+                            }, "Value", "Text"),
+                            new { @class = "form-select" })
+                        @Html.ValidationMessageFor(m => m.Genero, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-5">
+                        <label class="form-label">Tipo de tarjeta</label>
+                        @Html.DropDownListFor(m => m.TipoTarjetaId,
+                            (SelectList)ViewBag.TipoTarjetaId,
+                            "--Seleccione--",
+                            new { @class = "form-select" })
+                        @Html.ValidationMessageFor(m => m.TipoTarjetaId, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.NumeroTarjeta, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.NumeroTarjeta,
+                            new
+                                 {
+                                @class = "form-control",
+                                placeholder = "0000-0000-0000-0000",
+                                maxlength = "19",
+                                inputmode = "numeric",
+                                autocomplete = "cc-number",
+                                id = "NumeroTarjeta"
+                            })
+                        @Html.ValidationMessageFor(m => m.NumeroTarjeta, "", new { @class = "text-danger" })
+                    </div>
+
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">Crear cuenta</button>
+                    @Html.ActionLink("Ya tengo cuenta", "Login", "Account", null, new { @class = "btn btn-outline-secondary" })
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        (function () {
+            var input = document.getElementById('NumeroTarjeta');
+            if (!input) return;
+
+            function formatCardNumber(value) {
+                var digits = value.replace(/\D/g, '').substring(0, 16);
+                var parts = [];
+                for (var i = 0; i < digits.length; i += 4) {
+                    parts.push(digits.substring(i, i + 4));
+                }
+                return parts.join('-');
+            }
+
+            input.addEventListener('input', function () {
+                var caret = input.selectionStart || 0;
+                var before = input.value;
+
+                input.value = formatCardNumber(input.value);
+
+                if (input.value.length > before.length) caret++;
+                input.setSelectionRange(caret, caret);
+            });
+
+            input.addEventListener('paste', function () {
+                setTimeout(function () {
+                    input.value = formatCardNumber(input.value);
+                }, 0);
+            });
+        })();
+    </script>
+}
