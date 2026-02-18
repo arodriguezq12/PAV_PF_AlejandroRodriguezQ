@@ -1,0 +1,41 @@
+@model PAV_PF_AlejandroRodriguezQ.Models.Medicamento
+@{
+    ViewBag.Title = "Detalle medicamento";
+}
+
+<h2 class="mt-4">Detalle medicamento</h2>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">C&oacute;digo</dt>
+            <dd class="col-sm-9">@Model.MedicamentoCodigo</dd>
+
+            <dt class="col-sm-3">Nombre</dt>
+            <dd class="col-sm-9">@Model.Nombre</dd>
+
+            <dt class="col-sm-3">Precio</dt>
+            <dd class="col-sm-9">@Model.Precio.ToString("N2")</dd>
+
+            <dt class="col-sm-3">M&oacute;dulo</dt>
+            <dd class="col-sm-9">@(Model.ModuloMedicamento != null ? Model.ModuloMedicamento.Nombre : "-")</dd>
+
+            <dt class="col-sm-3">Tipo</dt>
+            <dd class="col-sm-9">@(Model.GeneroMedicamento != null ? Model.GeneroMedicamento.Nombre : "-")</dd>
+
+            <dt class="col-sm-3">Activo</dt>
+            <dd class="col-sm-9">@(Model.Activo ? "Sí" : "No")</dd>
+
+            <dt class="col-sm-3">Fecha creación</dt>
+            <dd class="col-sm-9">@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</dd>
+
+            <dt class="col-sm-3">Fecha actualización</dt>
+            <dd class="col-sm-9">@(Model.FechaActualizacion.HasValue ? Model.FechaActualizacion.Value.ToString("dd/MM/yyyy HH:mm") : "-")</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-3 d-flex gap-2">
+    @Html.ActionLink("Editar", "Edit", new { id = Model.MedicamentoCodigo }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Volver", "Index", null, new { @class = "btn btn-outline-secondary" })
+</div>
