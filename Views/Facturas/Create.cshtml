@@ -1,0 +1,66 @@
+@model PAV_PF_AlejandroRodriguezQ.Models.ViewModels.FacturaCreatePageVM
+@{ ViewBag.Title = "Crear factura"; }
+
+<h2 class="mt-4">Crear factura</h2>
+
+@if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+
+@using (Html.BeginForm("Create", "Facturas", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            @Html.LabelFor(m => m.Form.IdentificacionUsuario, new { @class = "form-label" })
+            @Html.TextBoxFor(m => m.Form.IdentificacionUsuario, new { @class = "form-control" })
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check">
+                @Html.CheckBoxFor(m => m.Form.EsExento, new { @class = "form-check-input" })
+                @Html.LabelFor(m => m.Form.EsExento, new { @class = "form-check-label" })
+            </div>
+        </div>
+    </div>
+
+    <h5 class="mt-4">Líneas</h5>
+    <table class="table table-bordered">
+        <thead><tr><th>Medicamento</th><th style="width:160px;">Cantidad</th></tr></thead>
+        <tbody>
+            @for (int i = 0; i < Model.Form.Lineas.Count; i++)
+            {
+                <tr>
+                    <td>@Html.DropDownListFor(m => m.Form.Lineas[i].MedicamentoCodigo, Model.Medicamentos, "-- Seleccione --", new { @class = "form-select" })</td>
+                    <td>
+                        @Html.TextBoxFor(m => m.Form.Lineas[i].Cantidad, new { @class = "form-control", type = "number", min = "1" })
+                        @Html.ValidationMessageFor(m => m.Form.Lineas[i].Cantidad, "", new { @class = "text-danger" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button class="btn btn-primary" type="submit">Calcular y guardar factura</button>
+}
+
+@if (Model.PreviewLineas != null && Model.PreviewLineas.Any())
+{
+    <hr />
+    <h5>Resumen calculado en servidor</h5>
+    <table class="table table-sm">
+        <thead><tr><th>Código</th><th>Nombre</th><th>Cantidad</th><th>P/U</th><th>Subtotal</th></tr></thead>
+        <tbody>
+            @foreach (var l in Model.PreviewLineas)
+            {
+                <tr><td>@l.MedicamentoCodigo</td><td>@l.Nombre</td><td>@l.Cantidad</td><td>@l.PrecioUnitario.ToString("N2")</td><td>@l.SubtotalLinea.ToString("N2")</td></tr>
+            }
+        </tbody>
+    </table>
+    <div><strong>Subtotal:</strong> @Model.PreviewSubtotal.ToString("N2")</div>
+    <div><strong>Impuestos:</strong> @Model.PreviewTotalImpuestos.ToString("N2")</div>
+    <div><strong>Total:</strong> @Model.PreviewTotal.ToString("N2")</div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
