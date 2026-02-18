@@ -1,6 +1,6 @@
 @model PAV_PF_AlejandroRodriguezQ.Models.GeneroMedicamento
-@{ ViewBag.Title = "Crear tipo de medicamento"; }
-<h2 class="mt-4">Crear tipo de medicamento</h2>
+@{ ViewBag.Title = "Crear género"; }
+<h2 class="mt-4">Crear género</h2>
 @using (Html.BeginForm()) {
 @Html.AntiForgeryToken(); @Html.ValidationSummary(true,"",new{@class="text-danger"})
 <div class="mb-3">@Html.LabelFor(m=>m.Nombre,new{@class="form-label"})@Html.TextBoxFor(m=>m.Nombre,new{@class="form-control"})</div>

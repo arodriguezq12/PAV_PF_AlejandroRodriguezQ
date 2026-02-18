@@ -14,7 +14,7 @@ namespace PAV_PF_AlejandroRodriguezQ.Models.ViewModels
         public string Nombre { get; set; }
 
         [Required]
-        [Range(0.01, 9999999, ErrorMessage = "El precio debe ser mayor a 0")]
+        [Range(typeof(decimal), "0.01", "9999999")]
         public decimal Precio { get; set; }
 
         [Required]
@@ -22,7 +22,7 @@ namespace PAV_PF_AlejandroRodriguezQ.Models.ViewModels
         public string ModuloCodigo { get; set; }
 
         [Required]
-        [Display(Name = "Tipo de medicamento")]
+        [Display(Name = "Género")]
         public int GeneroId { get; set; }
 
         public bool Activo { get; set; }

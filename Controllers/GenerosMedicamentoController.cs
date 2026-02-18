@@ -22,7 +22,7 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
             if (!ModelState.IsValid) return View(model);
             db.GeneroMedicamento.Add(model);
             db.SaveChanges();
-            TempData["Success"] = "Tipo de medicamento creado.";
+            TempData["Success"] = "Género creado.";
             return RedirectToAction("Index");
         }
 
@@ -45,7 +45,7 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
             entity.Descripcion = model.Descripcion;
             entity.Activo = model.Activo;
             db.SaveChanges();
-            TempData["Success"] = "Tipo de medicamento actualizado.";
+            TempData["Success"] = "Género actualizado.";
             return RedirectToAction("Index");
         }
 
@@ -57,7 +57,7 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
             if (item == null) return HttpNotFound();
             item.Activo = false;
             db.SaveChanges();
-            TempData["Success"] = "Tipo de medicamento desactivado.";
+            TempData["Success"] = "Género desactivado.";
             return RedirectToAction("Index");
         }
     }
