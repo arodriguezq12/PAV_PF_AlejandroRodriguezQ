@@ -1,0 +1,10 @@
+@model IEnumerable<PAV_PF_AlejandroRodriguezQ.Models.Impuesto>
+@{ ViewBag.Title = "Impuestos"; }
+<h2 class="mt-4">Impuestos (solo lectura)</h2>
+<table class="table table-bordered table-striped">
+<thead><tr><th>Código</th><th>Nombre</th><th>Porcentaje</th><th>Activo</th><th>Vigente desde</th></tr></thead>
+<tbody>
+@foreach (var i in Model) {
+<tr><td>@i.Codigo</td><td>@i.Nombre</td><td>@i.Porcentaje</td><td>@(i.Activo?"Sí":"No")</td><td>@i.VigenteDesde.ToString("dd/MM/yyyy")</td></tr>
+}
+</tbody></table>

@@ -1,0 +1,36 @@
+@model IEnumerable<PAV_PF_AlejandroRodriguezQ.Models.Factura>
+@{ ViewBag.Title = "Facturas"; }
+
+<h2 class="mt-4">Facturas</h2>
+
+@if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+@if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+
+@using (Html.BeginForm("Index", "Facturas", FormMethod.Get, new { @class = "row g-2 mb-3" }))
+{
+    <div class="col-md-3"><input class="form-control" name="numeroFactura" value="@ViewBag.NumeroFactura" placeholder="Número factura" /></div>
+    <div class="col-md-3"><input class="form-control" name="identificacionUsuario" value="@ViewBag.IdentificacionUsuario" placeholder="Identificación" /></div>
+    <div class="col-md-2"><input class="form-control" type="date" name="fechaDesde" value="@ViewBag.FechaDesde" /></div>
+    <div class="col-md-2"><input class="form-control" type="date" name="fechaHasta" value="@ViewBag.FechaHasta" /></div>
+    <div class="col-md-2 d-grid"><button class="btn btn-outline-primary" type="submit">Filtrar</button></div>
+}
+
+<div class="mb-3">@Html.ActionLink("Crear factura", "Create", null, new { @class = "btn btn-primary" })</div>
+
+<table class="table table-bordered table-striped">
+    <thead><tr><th>Número</th><th>Fecha</th><th>Subtotal</th><th>Impuestos</th><th>Total</th><th>Identificación</th><th></th></tr></thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.NumeroFactura</td>
+                <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@item.Subtotal.ToString("N2")</td>
+                <td>@item.TotalImpuestos.ToString("N2")</td>
+                <td>@item.Total.ToString("N2")</td>
+                <td>@item.IdentificacionUsuario</td>
+                <td>@Html.ActionLink("Detalle", "Details", new { id = item.FacturaId }, new { @class = "btn btn-sm btn-outline-info" })</td>
+            </tr>
+        }
+    </tbody>
+</table>
