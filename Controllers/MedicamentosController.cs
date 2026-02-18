@@ -59,8 +59,6 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
                 ModelState.AddModelError(nameof(vm.MedicamentoCodigo), "Ese código de medicamento ya existe.");
             }
 
-            ValidarPrecio(vm);
-
             if (!ModelState.IsValid)
             {
                 CargarCombos(vm.ModuloCodigo, vm.GeneroId);
@@ -117,8 +115,6 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(MedicamentoFormVM vm)
         {
-            ValidarPrecio(vm);
-
             if (!ModelState.IsValid)
             {
                 CargarCombos(vm.ModuloCodigo, vm.GeneroId);
@@ -182,14 +178,6 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
                 "Nombre",
                 generoSeleccionado
             );
-        }
-
-        private void ValidarPrecio(MedicamentoFormVM vm)
-        {
-            if (vm.Precio <= 0)
-            {
-                ModelState.AddModelError(nameof(vm.Precio), "El precio debe ser mayor a 0.");
-            }
         }
 
         protected override void Dispose(bool disposing)

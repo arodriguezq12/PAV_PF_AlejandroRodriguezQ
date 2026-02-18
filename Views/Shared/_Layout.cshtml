@@ -9,81 +9,44 @@
     @Scripts.Render("~/bundles/modernizr")
     <style>
         body {
-            background: #e9edf3;
+            background: #f4f7fb;
             color: #2e3a46;
         }
 
-        .fd-topbar {
-            background: #ffffff;
-            border-bottom: 1px solid #d7dfeb;
-            box-shadow: 0 2px 8px rgba(31, 70, 144, 0.07);
-            padding: 10px 0;
-            margin-bottom: 14px;
+        .fd-navbar {
+            background: linear-gradient(90deg, #ffffff 0%, #edf4ff 100%);
+            border-bottom: 1px solid #dce8ff;
+            box-shadow: 0 2px 10px rgba(31, 70, 144, 0.08);
         }
 
-        .fd-brand {
-            color: #1f4ea0;
+        .fd-navbar .navbar-brand {
+            color: #1f4ea0 !important;
             font-weight: 700;
-            font-size: 1.8rem;
-            text-decoration: none;
+            letter-spacing: .3px;
+        }
+
+        .fd-navbar .nav-link {
+            color: #34517a !important;
+            font-weight: 500;
+        }
+
+        .fd-navbar .nav-link:hover {
+            color: #1f4ea0 !important;
         }
 
         .fd-shell {
-            display: grid;
-            grid-template-columns: 230px 1fr;
-            gap: 16px;
-        }
-
-        .fd-sidebar {
-            background: #f5f8fd;
-            border: 1px solid #dce5f4;
-            border-radius: 12px;
-            padding: 12px;
-            height: fit-content;
-        }
-
-        .fd-nav-link {
-            display: block;
-            color: #34517a;
-            font-weight: 600;
-            text-decoration: none;
-            border-radius: 8px;
-            padding: 10px 12px;
-            margin-bottom: 6px;
-        }
-
-        .fd-nav-link:hover {
-            color: #1f4ea0;
-            background: #eaf1ff;
-        }
-
-        .fd-content {
             background: #fff;
-            border: 1px solid #e2e8f3;
+            border: 1px solid #e8eef8;
             border-radius: 14px;
+            margin-top: 18px;
             padding: 18px;
             box-shadow: 0 6px 20px rgba(31, 78, 160, 0.06);
-            min-height: 380px;
-        }
-
-        .fd-userbox {
-            color: #4c5f7a;
-            font-size: .95rem;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #dde6f4;
         }
 
         .fd-footer {
             color: #6f7f96;
             font-size: .92rem;
-            margin-top: 16px;
-        }
-
-        @@media (max-width: 991px) {
-            .fd-shell {
-                grid-template-columns: 1fr;
-            }
+            margin-top: 18px;
         }
     </style>
 </head>
@@ -101,6 +64,73 @@
                     if (profile != null && !string.IsNullOrWhiteSpace(profile.NombreCompleto))
                     {
                         displayName = profile.NombreCompleto;
+                    }
+                }
+            }
+            catch
+            {
+                // fallback al nombre actual si hay problema de DB
+            }
+        }
+    }
+
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm fd-navbar">
+        <div class="container">
+            @Html.ActionLink("FarmaDual", "Index", "Medicamentos", new { area = "" }, new { @class = "navbar-brand" })
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        @Html.ActionLink("Medicamentos", "Index", "Medicamentos", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Facturas", "Index", "Facturas", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Tipos", "Index", "GenerosMedicamento", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Módulos", "Index", "ModulosMedicamento", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Impuestos", "Index", "Impuestos", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Medicamentos", "Index", "Medicamentos", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Facturas", "Index", "Facturas", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Géneros", "Index", "GenerosMedicamento", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Módulos", "Index", "ModulosMedicamento", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Impuestos", "Index", "Impuestos", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav">
+                    @if (Request.IsAuthenticated)
+                    {
+                        <li class="nav-item d-flex align-items-center me-2">
+                            <span class="navbar-text">@displayName</span>
+                        </li>
+
+                        <li class="nav-item">
+                            @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-inline" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-primary btn-sm">
+                                    Cerrar sesión
+                                </button>
+                            }
+                        </li>
                     }
                 }
             }
@@ -150,7 +180,12 @@
                 @RenderBody()
             </main>
         </div>
+    </nav>
 
+    <div class="container">
+        <div class="fd-shell">
+            @RenderBody()
+        </div>
         <footer class="fd-footer">
             <p>&copy; @DateTime.Now.Year - FarmaDual</p>
         </footer>

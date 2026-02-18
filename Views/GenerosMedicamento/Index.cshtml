@@ -1,13 +1,13 @@
 @model IEnumerable<PAV_PF_AlejandroRodriguezQ.Models.GeneroMedicamento>
-@{ ViewBag.Title = "Tipos de medicamento"; }
-<h2 class="mt-4">Tipos de medicamento</h2>
+@{ ViewBag.Title = "Géneros de medicamento"; }
+<h2 class="mt-4">Géneros de medicamento</h2>
 @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
-<div class="mb-3">@Html.ActionLink("Nuevo tipo", "Create", null, new { @class = "btn btn-primary" })</div>
+<div class="mb-3">@Html.ActionLink("Nuevo género", "Create", null, new { @class = "btn btn-primary" })</div>
 <table class="table table-bordered"><thead><tr><th>Id</th><th>Nombre</th><th>Descripción</th><th>Activo</th><th></th></tr></thead><tbody>
 @foreach (var g in Model) {
 <tr><td>@g.GeneroId</td><td>@g.Nombre</td><td>@g.Descripcion</td><td>@(g.Activo?"Sí":"No")</td><td>
 @Html.ActionLink("Editar","Edit",new{id=g.GeneroId},new{@class="btn btn-sm btn-outline-primary"})
-@if (g.Activo) { using (Html.BeginForm("Deactivate","GenerosMedicamento",new{id=g.GeneroId},FormMethod.Post,new{@class="d-inline"})) { @Html.AntiForgeryToken()<button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Desactivar tipo de medicamento?');">Desactivar</button> } }
+@if (g.Activo) { using (Html.BeginForm("Deactivate","GenerosMedicamento",new{id=g.GeneroId},FormMethod.Post,new{@class="d-inline"})) { @Html.AntiForgeryToken()<button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Desactivar género?');">Desactivar</button> } }
 </td></tr>
 }
 </tbody></table>
