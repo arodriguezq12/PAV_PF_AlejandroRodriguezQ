@@ -134,6 +134,14 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MedicamentosController.cs" />
+    <Compile Include="Models\ViewModels\FacturaDetailsVM.cs" />
+    <Compile Include="Models\ViewModels\FacturaCreatePageVM.cs" />
+    <Compile Include="Models\ViewModels\FacturaCreateVM.cs" />
+    <Compile Include="Controllers\ImpuestosController.cs" />
+    <Compile Include="Controllers\ModulosMedicamentoController.cs" />
+    <Compile Include="Controllers\GenerosMedicamentoController.cs" />
+    <Compile Include="Controllers\FacturasController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -193,6 +201,7 @@
     </Compile>
     <Compile Include="Models\ViewModels\LoginVM.cs" />
     <Compile Include="Models\ViewModels\RegisterVM.cs" />
+    <Compile Include="Models\ViewModels\MedicamentoFormVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +274,20 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Medicamentos\Index.cshtml" />
+    <Content Include="Views\Medicamentos\Create.cshtml" />
+    <Content Include="Views\Medicamentos\Edit.cshtml" />
+    <Content Include="Views\Medicamentos\Details.cshtml" />
+    <Content Include="Views\Facturas\Index.cshtml" />
+    <Content Include="Views\Facturas\Create.cshtml" />
+    <Content Include="Views\Facturas\Details.cshtml" />
+    <Content Include="Views\GenerosMedicamento\Index.cshtml" />
+    <Content Include="Views\GenerosMedicamento\Create.cshtml" />
+    <Content Include="Views\GenerosMedicamento\Edit.cshtml" />
+    <Content Include="Views\ModulosMedicamento\Index.cshtml" />
+    <Content Include="Views\ModulosMedicamento\Create.cshtml" />
+    <Content Include="Views\ModulosMedicamento\Edit.cshtml" />
+    <Content Include="Views\Impuestos\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
