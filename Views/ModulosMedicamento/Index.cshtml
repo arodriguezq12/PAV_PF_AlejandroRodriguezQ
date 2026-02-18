@@ -1,0 +1,13 @@
+@model IEnumerable<PAV_PF_AlejandroRodriguezQ.Models.ModuloMedicamento>
+@{ ViewBag.Title = "Módulos de medicamento"; }
+<h2 class="mt-4">Módulos de medicamento</h2>
+@if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+<div class="mb-3">@Html.ActionLink("Nuevo módulo", "Create", null, new { @class = "btn btn-primary" })</div>
+<table class="table table-bordered"><thead><tr><th>Código</th><th>Nombre</th><th>Descripción</th><th>Activo</th><th></th></tr></thead><tbody>
+@foreach (var g in Model) {
+<tr><td>@g.ModuloCodigo</td><td>@g.Nombre</td><td>@g.Descripcion</td><td>@(g.Activo?"Sí":"No")</td><td>
+@Html.ActionLink("Editar","Edit",new{id=g.ModuloCodigo},new{@class="btn btn-sm btn-outline-primary"})
+@if (g.Activo) { using (Html.BeginForm("Deactivate","ModulosMedicamento",new{id=g.ModuloCodigo},FormMethod.Post,new{@class="d-inline"})) { @Html.AntiForgeryToken()<button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Desactivar módulo?');">Desactivar</button> } }
+</td></tr>
+}
+</tbody></table>

@@ -4,73 +4,155 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Mi aplicación ASP.NET</title>
+    <title>@ViewBag.Title - FarmaDual</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <style>
+        body {
+            background: #e9edf3;
+            color: #2e3a46;
+        }
+
+        .fd-topbar {
+            background: #ffffff;
+            border-bottom: 1px solid #d7dfeb;
+            box-shadow: 0 2px 8px rgba(31, 70, 144, 0.07);
+            padding: 10px 0;
+            margin-bottom: 14px;
+        }
+
+        .fd-brand {
+            color: #1f4ea0;
+            font-weight: 700;
+            font-size: 1.8rem;
+            text-decoration: none;
+        }
+
+        .fd-shell {
+            display: grid;
+            grid-template-columns: 230px 1fr;
+            gap: 16px;
+        }
+
+        .fd-sidebar {
+            background: #f5f8fd;
+            border: 1px solid #dce5f4;
+            border-radius: 12px;
+            padding: 12px;
+            height: fit-content;
+        }
+
+        .fd-nav-link {
+            display: block;
+            color: #34517a;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+        }
+
+        .fd-nav-link:hover {
+            color: #1f4ea0;
+            background: #eaf1ff;
+        }
+
+        .fd-content {
+            background: #fff;
+            border: 1px solid #e2e8f3;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 6px 20px rgba(31, 78, 160, 0.06);
+            min-height: 380px;
+        }
+
+        .fd-userbox {
+            color: #4c5f7a;
+            font-size: .95rem;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dde6f4;
+        }
+
+        .fd-footer {
+            color: #6f7f96;
+            font-size: .92rem;
+            margin-top: 16px;
+        }
+
+        @@media (max-width: 991px) {
+            .fd-shell {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
-        <div class="container">
-            @Html.ActionLink("Nombre de la aplicación", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        @Html.ActionLink("Inicio", "Index", "Home", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Acerca de", "About", "Home", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Contacto", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                </ul>
+    @{
+        var displayName = User?.Identity?.Name;
 
-                <ul class="navbar-nav">
-                    @if (Request.IsAuthenticated)
+        if (Request.IsAuthenticated)
+        {
+            try
+            {
+                using (var db = new PAV_PF_AlejandroRodriguezQ.Models.FarmaDualEntities1())
+                {
+                    var profile = db.UserProfile.FirstOrDefault(u => u.Correo == User.Identity.Name);
+                    if (profile != null && !string.IsNullOrWhiteSpace(profile.NombreCompleto))
                     {
-                        <ul class="navbar-nav ms-auto">
-
-                            <li class="nav-item">
-                                <span class="navbar-text text-white me-3">
-                                    @User.Identity.Name
-                                </span>
-                            </li>
-
-                            <li class="nav-item">
-                                @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-inline" }))
-                                {
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-outline-light btn-sm">
-                                        Cerrar sesión
-                                    </button>
-                                }
-                            </li>
-
-                        </ul>
+                        displayName = profile.NombreCompleto;
                     }
-                    else
+                }
+            }
+            catch
+            {
+                // fallback al nombre actual
+            }
+        }
+    }
+
+    <header class="fd-topbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            @Html.ActionLink("FarmaDual", "Index", "Medicamentos", new { area = "" }, new { @class = "fd-brand" })
+
+            @if (Request.IsAuthenticated)
+            {
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted">@displayName</span>
+                    @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-inline" }))
                     {
-                        <li class="nav-item">
-                            @Html.ActionLink("Login", "Login", "Account", null, new { @class = "nav-link" })
-                        </li>
-                        <li class="nav-item">
-                            @Html.ActionLink("Registro", "Register", "Account", null, new { @class = "nav-link" })
-                        </li>
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-primary btn-sm">Cerrar sesi&oacute;n</button>
                     }
-                </ul>
-            </div>
-
+                </div>
+            }
+            else
+            {
+                <div class="d-flex gap-2">
+                    @Html.ActionLink("Login", "Login", "Account", null, new { @class = "btn btn-outline-primary btn-sm" })
+                    @Html.ActionLink("Registro", "Register", "Account", null, new { @class = "btn btn-primary btn-sm" })
+                </div>
+            }
         </div>
-    </nav>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - Mi aplicación ASP.NET</p>
+    </header>
+
+    <div class="container">
+        <div class="fd-shell">
+            <aside class="fd-sidebar">
+                <a class="fd-nav-link" href="@Url.Action("Index", "Medicamentos")">Medicamentos</a>
+                <a class="fd-nav-link" href="@Url.Action("Index", "Facturas")">Facturas</a>
+                <a class="fd-nav-link" href="@Url.Action("Index", "GenerosMedicamento")">Tipos</a>
+                <a class="fd-nav-link" href="@Url.Action("Index", "ModulosMedicamento")">M&oacute;dulos</a>
+                <a class="fd-nav-link" href="@Url.Action("Index", "Impuestos")">Impuestos</a>
+            </aside>
+
+            <main class="fd-content">
+                @RenderBody()
+            </main>
+        </div>
+
+        <footer class="fd-footer">
+            <p>&copy; @DateTime.Now.Year - FarmaDual</p>
         </footer>
     </div>
 
