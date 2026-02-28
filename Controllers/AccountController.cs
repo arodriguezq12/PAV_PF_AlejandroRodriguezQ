@@ -14,6 +14,36 @@ namespace FarmaDual.Controllers
     {
         private readonly FarmaDualEntities1 db = new FarmaDualEntities1();
 
+        private static string NormalizeEmail(string email)
+        {
+            return (email ?? string.Empty).Trim().ToLowerInvariant();
+        }
+
+        private void SignInUser(string correo, string role, bool rememberMe)
+        {
+            var ticket = new FormsAuthenticationTicket(
+                1,
+                correo,
+                DateTime.Now,
+                DateTime.Now.AddMinutes(30),
+                rememberMe,
+                string.IsNullOrWhiteSpace(role) ? "Cliente" : role
+            );
+
+            string encTicket = FormsAuthentication.Encrypt(ticket);
+
+            var cookie = new System.Web.HttpCookie(FormsAuthentication.FormsCookieName, encTicket)
+            {
+                HttpOnly = true,
+                Secure = Request.IsSecureConnection
+            };
+
+            if (rememberMe)
+                cookie.Expires = ticket.Expiration;
+
+            Response.Cookies.Add(cookie);
+        }
+
         [HttpGet]
         public ActionResult Register(string returnUrl)
         {
@@ -190,9 +220,16 @@ namespace FarmaDual.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
 
+            vm.Correo = NormalizeEmail(vm.Correo);
+
+            // El binder valida antes de entrar al action. Si el correo trae espacios,
+            // puede quedar inválido aunque al normalizar sí sea correcto.
+            ModelState.Remove(nameof(vm.Correo));
+            TryValidateModel(vm);
+
             if (!ModelState.IsValid) return View(vm);
 
-            var auth = db.UsuarioAuth.FirstOrDefault(x => x.Correo == vm.Correo && x.Activo);
+            var auth = db.UsuarioAuth.FirstOrDefault(x => x.Correo.ToLower() == vm.Correo && x.Activo);
 
             if (auth == null || !Crypto.VerifyHashedPassword(auth.PasswordHash, vm.Password))
             {
@@ -200,29 +237,7 @@ namespace FarmaDual.Controllers
                 return View(vm);
             }
 
-            var role = auth.Rol ?? "Cliente";
-
-            var ticket = new FormsAuthenticationTicket(
-                1,
-                vm.Correo,                      // Name => User.Identity.Name
-                DateTime.Now,
-                DateTime.Now.AddMinutes(30),
-                vm.RememberMe,
-                role                            // UserData => rol
-            );
-
-            string encTicket = FormsAuthentication.Encrypt(ticket);
-
-            var cookie = new System.Web.HttpCookie(FormsAuthentication.FormsCookieName, encTicket)
-            {
-                HttpOnly = true,
-                Secure = Request.IsSecureConnection
-            };
-
-            if (vm.RememberMe)
-                cookie.Expires = ticket.Expiration;
-
-            Response.Cookies.Add(cookie);
+            SignInUser(auth.Correo, auth.Rol, vm.RememberMe);
 
 
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
