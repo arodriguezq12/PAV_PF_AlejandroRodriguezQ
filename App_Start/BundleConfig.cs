@@ -11,18 +11,21 @@ namespace PAV_PF_AlejandroRodriguezQ
             // Mantener comportamiento por ambiente y evitar minificación de WebGrease en JS.
             BundleTable.EnableOptimizations = false;
 
-            bundles.Add(CreateScriptBundleWithoutMinification("~/bundles/jquery",
-                "~/Scripts/jquery-3.7.0.min.js"));
+            // Use plain Bundle (instead of ScriptBundle) to avoid WebGrease JS minification/parsing.
+            bundles.Add(new Bundle("~/bundles/jquery").Include(
+                        "~/Scripts/jquery-3.7.0.min.js"));
 
-            bundles.Add(CreateScriptBundleWithoutMinification("~/bundles/jqueryval",
-                "~/Scripts/jquery.validate.min.js",
-                "~/Scripts/jquery.validate.unobtrusive.min.js"));
+            bundles.Add(new Bundle("~/bundles/jqueryval").Include(
+                        "~/Scripts/jquery.validate.min.js",
+                        "~/Scripts/jquery.validate.unobtrusive.min.js"));
 
-            bundles.Add(CreateScriptBundleWithoutMinification("~/bundles/modernizr",
-                "~/Scripts/modernizr-2.8.3.js"));
+            // Use modernizr minified file
+            bundles.Add(new Bundle("~/bundles/modernizr").Include(
+                        "~/Scripts/modernizr-2.8.3.js"));
 
-            bundles.Add(CreateScriptBundleWithoutMinification("~/bundles/bootstrap",
-                "~/Scripts/bootstrap.bundle.min.js"));
+            // Use the minified bootstrap bundle (includes Popper) and skip JS transforms.
+            bundles.Add(new Bundle("~/bundles/bootstrap").Include(
+                      "~/Scripts/bootstrap.bundle.min.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
@@ -31,8 +34,7 @@ namespace PAV_PF_AlejandroRodriguezQ
 
         private static ScriptBundle CreateScriptBundleWithoutMinification(string virtualPath, params string[] includes)
         {
-            var bundle = new ScriptBundle(virtualPath);
-            bundle.Include(includes);
+            var bundle = new ScriptBundle(virtualPath).Include(includes);
             bundle.Transforms.Clear();
             bundle.Transforms.Add(new PreserveJsTransform());
             return bundle;
