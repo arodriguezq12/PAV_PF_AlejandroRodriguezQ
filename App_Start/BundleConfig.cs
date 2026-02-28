@@ -8,7 +8,7 @@ namespace PAV_PF_AlejandroRodriguezQ
         // Para obtener más información sobre las uniones, visite https://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
-            // Disable default bundling transforms (minification) to avoid WebGrease parser crashes with modern JS syntax
+            // Mantener comportamiento por ambiente y evitar minificación de WebGrease en JS.
             BundleTable.EnableOptimizations = false;
 
             // Use plain Bundle (instead of ScriptBundle) to avoid WebGrease JS minification/parsing.
@@ -30,6 +30,22 @@ namespace PAV_PF_AlejandroRodriguezQ
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
+        }
+
+        private static ScriptBundle CreateScriptBundleWithoutMinification(string virtualPath, params string[] includes)
+        {
+            var bundle = new ScriptBundle(virtualPath).Include(includes);
+            bundle.Transforms.Clear();
+            bundle.Transforms.Add(new PreserveJsTransform());
+            return bundle;
+        }
+
+        private sealed class PreserveJsTransform : IBundleTransform
+        {
+            public void Process(BundleContext context, BundleResponse response)
+            {
+                response.ContentType = "text/javascript";
+            }
         }
     }
 }
