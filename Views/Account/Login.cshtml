@@ -32,7 +32,9 @@
                     <label class="form-check-label" for="RememberMe">Recordarme</label>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                <button type="submit" id="btnEntrar" class="btn btn-primary w-100">
+                    <span class="btn-text">Entrar</span>
+                </button>
             }
 
             <div class="mt-3 text-center">
@@ -45,4 +47,17 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        (function () {
+            var form = document.getElementById('loginForm');
+            var button = document.getElementById('btnEntrar');
+
+            if (!form || !button) return;
+
+            form.addEventListener('submit', function () {
+                button.disabled = true;
+                button.querySelector('.btn-text').textContent = 'Validando...';
+            });
+        })();
+    </script>
 }
