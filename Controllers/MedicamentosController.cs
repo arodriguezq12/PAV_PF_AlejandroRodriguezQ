@@ -50,10 +50,12 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
             return View(new MedicamentoFormVM { Activo = true });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(MedicamentoFormVM vm)
         {
+            // Existing POST Create implementation moved here for admin-only access
             if (db.Medicamento.Any(m => m.MedicamentoCodigo == vm.MedicamentoCodigo))
             {
                 ModelState.AddModelError(nameof(vm.MedicamentoCodigo), "Ese código de medicamento ya existe.");
@@ -84,6 +86,8 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
             return RedirectToAction("Index");
         }
 
+        
+
         public ActionResult Edit(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -111,6 +115,7 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
             return View(vm);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(MedicamentoFormVM vm)
@@ -140,6 +145,7 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Deactivate(string id)

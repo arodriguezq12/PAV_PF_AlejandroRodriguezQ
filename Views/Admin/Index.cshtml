@@ -1,0 +1,37 @@
+@model IEnumerable<PAV_PF_AlejandroRodriguezQ.Models.UsuarioAuth>
+@{
+    ViewBag.Title = "Administración de usuarios";
+}
+
+<h2 class="mt-4">Administración de usuarios</h2>
+
+@if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+
+<table class="table table-striped">
+    <thead>
+        <tr><th>Correo</th><th>Nombre</th><th>Rol</th><th>Activo</th><th></th></tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            var profile = u.UserProfile;
+            <tr>
+                <td>@u.Correo</td>
+                <td>@(profile != null ? profile.NombreCompleto : "-")</td>
+                <td>@(string.IsNullOrWhiteSpace(u.Rol) ? "Cliente" : u.Rol)</td>
+                <td>@(u.Activo ? "Sí" : "No")</td>
+                <td>
+                    @if ((u.Rol ?? "") != "Admin")
+                    {
+                        using (Html.BeginForm("Promote", "Admin", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("id", u.UsuarioAuthId)
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Promover a admin</button>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

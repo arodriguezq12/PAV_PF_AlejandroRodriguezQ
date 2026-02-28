@@ -51,141 +51,46 @@
     </style>
 </head>
 <body>
-    @{
-        var displayName = User?.Identity?.Name;
-
-        if (Request.IsAuthenticated)
-        {
-            try
-            {
-                using (var db = new PAV_PF_AlejandroRodriguezQ.Models.FarmaDualEntities1())
-                {
-                    var profile = db.UserProfile.FirstOrDefault(u => u.Correo == User.Identity.Name);
-                    if (profile != null && !string.IsNullOrWhiteSpace(profile.NombreCompleto))
-                    {
-                        displayName = profile.NombreCompleto;
-                    }
-                }
-            }
-            catch
-            {
-                // fallback al nombre actual si hay problema de DB
-            }
-        }
-    }
+    @* El bloque que consultaba la BD fue movido a acciones parciales en ProfileController.
+       Usamos Html.Action para renderizar el fragmento de usuario en navbar y header. *@
 
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm fd-navbar">
         <div class="container">
             @Html.ActionLink("FarmaDual", "Index", "Medicamentos", new { area = "" }, new { @class = "navbar-brand" })
-            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        @Html.ActionLink("Medicamentos", "Index", "Medicamentos", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Facturas", "Index", "Facturas", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Tipos", "Index", "GenerosMedicamento", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Módulos", "Index", "ModulosMedicamento", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Impuestos", "Index", "Impuestos", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Medicamentos", "Index", "Medicamentos", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Facturas", "Index", "Facturas", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Géneros", "Index", "GenerosMedicamento", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Módulos", "Index", "ModulosMedicamento", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Impuestos", "Index", "Impuestos", new { area = "" }, new { @class = "nav-link" })
-                    </li>
+                    <li class="nav-item">@Html.ActionLink("Medicamentos", "Index", "Medicamentos", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li class="nav-item">@Html.ActionLink("Facturas", "Index", "Facturas", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li class="nav-item">@Html.ActionLink("Tipos de medicamentos", "Index", "GenerosMedicamento", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li class="nav-item">@Html.ActionLink("Módulos", "Index", "ModulosMedicamento", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li class="nav-item">@Html.ActionLink("Impuestos", "Index", "Impuestos", new { area = "" }, new { @class = "nav-link" })</li>
                 </ul>
 
-                <ul class="navbar-nav">
-                    @if (Request.IsAuthenticated)
+                @{ var isAdmin = User?.IsInRole("Admin") == true; }
+                @* Enlace al panel de administración visible solo para administradores *@
+                <div class="d-none d-sm-block me-3">
+                    @if (isAdmin)
                     {
-                        <li class="nav-item d-flex align-items-center me-2">
-                            <span class="navbar-text">@displayName</span>
-                        </li>
-
-                        <li class="nav-item">
-                            @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-inline" }))
-                            {
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-outline-primary btn-sm">
-                                    Cerrar sesión
-                                </button>
-                            }
-                        </li>
-                    }
-                }
-            }
-            catch
-            {
-                // fallback al nombre actual
-            }
-        }
-    }
-
-    <header class="fd-topbar">
-        <div class="container d-flex justify-content-between align-items-center">
-            @Html.ActionLink("FarmaDual", "Index", "Medicamentos", new { area = "" }, new { @class = "fd-brand" })
-
-            @if (Request.IsAuthenticated)
-            {
-                <div class="d-flex align-items-center gap-2">
-                    <span class="text-muted">@displayName</span>
-                    @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-inline" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-outline-primary btn-sm">Cerrar sesi&oacute;n</button>
+                        <text>@Html.ActionLink("Panel admin", "Index", "Admin", new { area = "" }, new { @class = "btn btn-outline-secondary btn-sm" })</text>
                     }
                 </div>
-            }
-            else
-            {
-                <div class="d-flex gap-2">
-                    @Html.ActionLink("Login", "Login", "Account", null, new { @class = "btn btn-outline-primary btn-sm" })
-                    @Html.ActionLink("Registro", "Register", "Account", null, new { @class = "btn btn-primary btn-sm" })
-                </div>
-            }
+
+                @{ Html.RenderAction("UserNav", "Profile"); }
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <div class="container">
+    <div class="container mt-3">
         <div class="fd-shell">
-            <aside class="fd-sidebar">
-                <a class="fd-nav-link" href="@Url.Action("Index", "Medicamentos")">Medicamentos</a>
-                <a class="fd-nav-link" href="@Url.Action("Index", "Facturas")">Facturas</a>
-                <a class="fd-nav-link" href="@Url.Action("Index", "GenerosMedicamento")">Tipos</a>
-                <a class="fd-nav-link" href="@Url.Action("Index", "ModulosMedicamento")">M&oacute;dulos</a>
-                <a class="fd-nav-link" href="@Url.Action("Index", "Impuestos")">Impuestos</a>
-            </aside>
-
             <main class="fd-content">
                 @RenderBody()
             </main>
         </div>
-    </nav>
 
-    <div class="container">
-        <div class="fd-shell">
-            @RenderBody()
-        </div>
         <footer class="fd-footer">
             <p>&copy; @DateTime.Now.Year - FarmaDual</p>
         </footer>

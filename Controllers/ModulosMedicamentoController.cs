@@ -5,7 +5,7 @@ using PAV_PF_AlejandroRodriguezQ.Models;
 
 namespace PAV_PF_AlejandroRodriguezQ.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class ModulosMedicamentoController : Controller
     {
         private readonly FarmaDualEntities1 db = new FarmaDualEntities1();
@@ -61,6 +61,16 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
             db.SaveChanges();
             TempData["Success"] = "Módulo desactivado.";
             return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

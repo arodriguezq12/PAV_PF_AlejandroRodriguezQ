@@ -265,5 +265,15 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
                 PreviewTotal = total
             };
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
     }
 }

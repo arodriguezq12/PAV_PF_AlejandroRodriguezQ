@@ -6,7 +6,7 @@ using PAV_PF_AlejandroRodriguezQ.Models;
 
 namespace PAV_PF_AlejandroRodriguezQ.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class GenerosMedicamentoController : Controller
     {
         private readonly FarmaDualEntities1 db = new FarmaDualEntities1();
@@ -59,6 +59,16 @@ namespace PAV_PF_AlejandroRodriguezQ.Controllers
             db.SaveChanges();
             TempData["Success"] = "Género desactivado.";
             return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
     }
 }
