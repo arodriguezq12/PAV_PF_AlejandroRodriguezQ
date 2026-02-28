@@ -11,19 +11,20 @@ namespace PAV_PF_AlejandroRodriguezQ
             // Disable default bundling transforms (minification) to avoid WebGrease parser crashes with modern JS syntax
             BundleTable.EnableOptimizations = false;
 
-            // Include the pre-minified jQuery to avoid runtime minifier crashes with newer jQuery syntax
-            bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
+            // Use plain Bundle (instead of ScriptBundle) to avoid WebGrease JS minification/parsing.
+            bundles.Add(new Bundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-3.7.0.min.js"));
 
-            bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
+            bundles.Add(new Bundle("~/bundles/jqueryval").Include(
+                        "~/Scripts/jquery.validate.min.js",
                         "~/Scripts/jquery.validate.unobtrusive.min.js"));
 
             // Use modernizr minified file
-            bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
+            bundles.Add(new Bundle("~/bundles/modernizr").Include(
                         "~/Scripts/modernizr-2.8.3.js"));
 
-            // Use the minified bootstrap bundle (includes Popper) to avoid minification issues
-            bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
+            // Use the minified bootstrap bundle (includes Popper) and skip JS transforms.
+            bundles.Add(new Bundle("~/bundles/bootstrap").Include(
                       "~/Scripts/bootstrap.bundle.min.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
