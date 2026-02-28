@@ -8,7 +8,7 @@ namespace PAV_PF_AlejandroRodriguezQ
         // Para obtener más información sobre las uniones, visite https://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
-            // Disable default bundling transforms (minification) to avoid WebGrease parser crashes with modern JS syntax
+            // Keep framework default (debug/release behavior) and disable only JS minification transforms per bundle.
             BundleTable.EnableOptimizations = false;
 
             // Use plain Bundle (instead of ScriptBundle) to avoid WebGrease JS minification/parsing.
