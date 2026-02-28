@@ -11,28 +11,21 @@ namespace PAV_PF_AlejandroRodriguezQ
             // Keep framework default (debug/release behavior) and disable only JS minification transforms per bundle.
             BundleTable.EnableOptimizations = false;
 
-            var jqueryBundle = new ScriptBundle("~/bundles/jquery").Include(
-                        "~/Scripts/jquery-3.7.0.min.js");
-            jqueryBundle.Transforms.Clear();
-            bundles.Add(jqueryBundle);
+            // Use plain Bundle (instead of ScriptBundle) to avoid WebGrease JS minification/parsing.
+            bundles.Add(new Bundle("~/bundles/jquery").Include(
+                        "~/Scripts/jquery-3.7.0.min.js"));
 
-            var jqueryValBundle = new ScriptBundle("~/bundles/jqueryval").Include(
+            bundles.Add(new Bundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate.min.js",
-                        "~/Scripts/jquery.validate.unobtrusive.min.js");
-            jqueryValBundle.Transforms.Clear();
-            bundles.Add(jqueryValBundle);
+                        "~/Scripts/jquery.validate.unobtrusive.min.js"));
 
-            // Modernizr can remain as delivered file; avoid WebGrease transforms as well.
-            var modernizrBundle = new ScriptBundle("~/bundles/modernizr").Include(
-                        "~/Scripts/modernizr-2.8.3.js");
-            modernizrBundle.Transforms.Clear();
-            bundles.Add(modernizrBundle);
+            // Use modernizr minified file
+            bundles.Add(new Bundle("~/bundles/modernizr").Include(
+                        "~/Scripts/modernizr-2.8.3.js"));
 
             // Use the minified bootstrap bundle (includes Popper) and skip JS transforms.
-            var bootstrapBundle = new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/bootstrap.bundle.min.js");
-            bootstrapBundle.Transforms.Clear();
-            bundles.Add(bootstrapBundle);
+            bundles.Add(new Bundle("~/bundles/bootstrap").Include(
+                      "~/Scripts/bootstrap.bundle.min.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
