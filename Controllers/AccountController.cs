@@ -222,11 +222,6 @@ namespace FarmaDual.Controllers
 
             vm.Correo = NormalizeEmail(vm.Correo);
 
-            // El binder valida antes de entrar al action. Si el correo trae espacios,
-            // puede quedar inválido aunque al normalizar sí sea correcto.
-            ModelState.Remove(nameof(vm.Correo));
-            TryValidateModel(vm);
-
             if (!ModelState.IsValid) return View(vm);
 
             var auth = db.UsuarioAuth.FirstOrDefault(x => x.Correo.ToLower() == vm.Correo && x.Activo);
