@@ -9,7 +9,7 @@
 
             <h3 class="mb-4">Iniciar sesión</h3>
 
-            @using (Html.BeginForm("Login", "Account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { id = "loginForm", novalidate = "novalidate" }))
+            @using (Html.BeginForm("Login", "Account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { id = "loginForm" }))
             {
                 @Html.AntiForgeryToken()
 
@@ -17,7 +17,7 @@
 
                 <div class="mb-3">
                     @Html.LabelFor(m => m.Correo, new { @class = "form-label" })
-                    @Html.TextBoxFor(m => m.Correo, new { @class = "form-control", type = "text", autocomplete = "username", spellcheck = "false" })
+                    @Html.TextBoxFor(m => m.Correo, new { @class = "form-control", type = "email", autocomplete = "username", spellcheck = "false" })
                     @Html.ValidationMessageFor(m => m.Correo, "", new { @class = "text-danger" })
                 </div>
 
