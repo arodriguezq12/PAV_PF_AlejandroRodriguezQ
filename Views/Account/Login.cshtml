@@ -9,7 +9,15 @@
 
             <h3 class="mb-4">Iniciar sesión</h3>
 
-            <form id="loginForm" method="post" action="@Url.Action("Login", "Account", new { returnUrl = ViewBag.ReturnUrl })">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error:</strong>
+                    @Html.ValidationSummary(false)
+                </div>
+            }
+
+            <form action="@Url.Action("Login", "Account")" method="post" id="loginForm">
                 @Html.AntiForgeryToken()
                 @if (ViewBag.DebugMode == true)
                 {
@@ -57,19 +65,19 @@
                 }
 
                 <div class="mb-3">
-                    @Html.LabelFor(m => m.Correo, new { @class = "form-label" })
-                    @Html.TextBoxFor(m => m.Correo, new { @class = "form-control", type = "email", autocomplete = "username", spellcheck = "false" })
-                    @Html.ValidationMessageFor(m => m.Correo, "", new { @class = "text-danger" })
+                    <label for="Correo" class="form-label">Correo</label>
+                    <input type="email" class="form-control" id="Correo" name="Correo" value="@Model.Correo" required placeholder="tu@email.com" />
+                    @Html.ValidationMessageFor(m => m.Correo, "", new { @class = "text-danger d-block mt-1" })
                 </div>
 
                 <div class="mb-3">
-                    @Html.LabelFor(m => m.Password, new { @class = "form-label" })
-                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", autocomplete = "current-password" })
-                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                    <label for="Password" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" id="Password" name="Password" required placeholder="Contraseña" />
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger d-block mt-1" })
                 </div>
 
                 <div class="form-check mb-3">
-                    @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input", id = "RememberMe" })
+                    <input type="checkbox" class="form-check-input" id="RememberMe" name="RememberMe" />
                     <label class="form-check-label" for="RememberMe">Recordarme</label>
                 </div>
 

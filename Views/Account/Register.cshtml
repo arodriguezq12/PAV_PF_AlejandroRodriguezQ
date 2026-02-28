@@ -9,9 +9,16 @@
 
             <h3 class="mb-4">Registro</h3>
 
-            @using (Html.BeginForm("Register", "Account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
+            @using (Html.BeginForm("Register", "Account", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
+
+                <text>
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.ReturnUrl))
+                    {
+                        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                    }
+                </text>
 
                 @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
 

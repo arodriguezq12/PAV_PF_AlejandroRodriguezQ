@@ -243,20 +243,11 @@ namespace FarmaDual.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
 
-            var debugMode = IsDebugLoginEnabled();
-            ViewBag.DebugMode = debugMode;
-            var debugSteps = debugMode ? new System.Collections.Generic.List<string>() : null;
-            AddLoginDebugStep(debugSteps, "Inicio de POST /Account/Login.");
+            // TEST: Return immediately to verify POST is working
+            return Content("TEST: POST recibido. Email: " + (vm?.Correo ?? "NULL"));
+        }
 
-            vm.Correo = NormalizeEmail(vm.Correo);
-            AddLoginDebugStep(debugSteps, $"Correo normalizado: {vm.Correo}.");
-
-            if (!ModelState.IsValid)
-            {
-                AddLoginDebugStep(debugSteps, "ModelState inválido. Se devuelve la vista con errores.");
-                ViewBag.DebugLoginTrace = debugSteps;
-                return View(vm);
-            }
+            if (!ModelState.IsValid) return View(vm);
 
             var auth = db.UsuarioAuth.FirstOrDefault(x =>
                 x.Activo &&
@@ -265,23 +256,16 @@ namespace FarmaDual.Controllers
 
             if (!PasswordMatches(auth, vm.Password))
             {
-                AddLoginDebugStep(debugSteps, "PasswordMatches devolvió false.");
                 ModelState.AddModelError("", "Credenciales inválidas.");
-                ViewBag.DebugLoginTrace = debugSteps;
                 return View(vm);
             }
 
-            AddLoginDebugStep(debugSteps, "PasswordMatches devolvió true. Firmando usuario.");
             SignInUser(auth.Correo, auth.Rol, vm.RememberMe);
 
 
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
-            {
-                AddLoginDebugStep(debugSteps, $"Redirección a returnUrl local: {returnUrl}.");
                 return Redirect(returnUrl);
-            }
 
-            AddLoginDebugStep(debugSteps, "Redirección por defecto a Medicamentos/Index.");
             return RedirectToAction("Index", "Medicamentos");
         }
 
