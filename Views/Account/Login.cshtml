@@ -51,8 +51,9 @@
         (function () {
             var form = document.getElementById('loginForm');
             var button = document.getElementById('btnEntrar');
+            var textNode = button ? button.querySelector('.btn-text') : null;
 
-            if (!form || !button) return;
+            if (!form || !button || !textNode) return;
 
             var defaultText = 'Entrar';
             var loadingText = 'Validando...';
