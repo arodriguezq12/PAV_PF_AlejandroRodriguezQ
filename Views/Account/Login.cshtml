@@ -60,45 +60,26 @@
 
             function setButtonState(isLoading) {
                 button.disabled = isLoading;
-                textNode.textContent = isLoading ? loadingText : defaultText;
+                button.querySelector('.btn-text').textContent = isLoading ? loadingText : defaultText;
             }
 
-            function isFormValid() {
+            form.addEventListener('submit', function () {
                 if (typeof form.checkValidity === 'function' && !form.checkValidity()) {
-                    return false;
-                }
-
-                if (window.jQuery && typeof jQuery(form).valid === 'function' && !jQuery(form).valid()) {
-                    return false;
-                }
-
-                return true;
-            }
-
-            form.addEventListener('submit', function (event) {
-                if (form.dataset.submitting === 'true') {
-                    event.preventDefault();
-                    return;
-                }
-
-                if (!isFormValid()) {
                     setButtonState(false);
                     return;
                 }
 
-                form.dataset.submitting = 'true';
+                if (window.jQuery && typeof jQuery(form).valid === 'function' && !jQuery(form).valid()) {
+                    setButtonState(false);
+                    return;
+                }
+
                 setButtonState(true);
             });
 
             form.addEventListener('invalid', function () {
-                form.dataset.submitting = 'false';
                 setButtonState(false);
             }, true);
-
-            window.addEventListener('pageshow', function () {
-                form.dataset.submitting = 'false';
-                setButtonState(false);
-            });
         })();
     </script>
 }
