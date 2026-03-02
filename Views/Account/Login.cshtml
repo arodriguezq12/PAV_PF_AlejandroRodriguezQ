@@ -51,12 +51,53 @@
         (function () {
             var form = document.getElementById('loginForm');
             var button = document.getElementById('btnEntrar');
+            var textNode = button ? button.querySelector('.btn-text') : null;
 
-            if (!form || !button) return;
+            if (!form || !button || !textNode) return;
 
-            form.addEventListener('submit', function () {
-                button.disabled = true;
-                button.querySelector('.btn-text').textContent = 'Validando...';
+            var defaultText = 'Entrar';
+            var loadingText = 'Validando...';
+
+            function setButtonState(isLoading) {
+                button.disabled = isLoading;
+                textNode.textContent = isLoading ? loadingText : defaultText;
+            }
+
+            function isFormValid() {
+                if (typeof form.checkValidity === 'function' && !form.checkValidity()) {
+                    return false;
+                }
+
+                if (window.jQuery && typeof jQuery(form).valid === 'function' && !jQuery(form).valid()) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            form.addEventListener('submit', function (event) {
+                if (form.dataset.submitting === 'true') {
+                    event.preventDefault();
+                    return;
+                }
+
+                if (!isFormValid()) {
+                    setButtonState(false);
+                    return;
+                }
+
+                form.dataset.submitting = 'true';
+                setButtonState(true);
+            });
+
+            form.addEventListener('invalid', function () {
+                form.dataset.submitting = 'false';
+                setButtonState(false);
+            }, true);
+
+            window.addEventListener('pageshow', function () {
+                form.dataset.submitting = 'false';
+                setButtonState(false);
             });
         })();
     </script>
