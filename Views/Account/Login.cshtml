@@ -54,10 +54,31 @@
 
             if (!form || !button) return;
 
+            var defaultText = 'Entrar';
+            var loadingText = 'Validando...';
+
+            function setButtonState(isLoading) {
+                button.disabled = isLoading;
+                button.querySelector('.btn-text').textContent = isLoading ? loadingText : defaultText;
+            }
+
             form.addEventListener('submit', function () {
-                button.disabled = true;
-                button.querySelector('.btn-text').textContent = 'Validando...';
+                if (typeof form.checkValidity === 'function' && !form.checkValidity()) {
+                    setButtonState(false);
+                    return;
+                }
+
+                if (window.jQuery && typeof jQuery(form).valid === 'function' && !jQuery(form).valid()) {
+                    setButtonState(false);
+                    return;
+                }
+
+                setButtonState(true);
             });
+
+            form.addEventListener('invalid', function () {
+                setButtonState(false);
+            }, true);
         })();
     </script>
 }
