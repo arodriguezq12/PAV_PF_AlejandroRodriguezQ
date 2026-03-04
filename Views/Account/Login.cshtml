@@ -16,7 +16,26 @@
                     <input type="hidden" name="debug" value="1" />
                 }
 
-                @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+                @Html.ValidationSummary(false, "", new { @class = "text-danger mb-3" })
+
+                @if (ViewBag.DebugMode == true)
+                {
+                    var trace = ViewBag.DebugLoginTrace as System.Collections.Generic.IEnumerable<string>;
+                    <div class="alert alert-warning small" role="alert">
+                        <strong>Debug Login Activo</strong>
+                        <div>Tip: desactiva quitando <code>?debug=1</code> de la URL.</div>
+                        @if (trace != null)
+                        {
+                            <hr class="my-2" />
+                            <ul class="mb-0 ps-3">
+                                @foreach (var step in trace)
+                                {
+                                    <li>@step</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                }
 
                 @if (ViewBag.DebugMode == true)
                 {

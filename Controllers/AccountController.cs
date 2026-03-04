@@ -151,7 +151,7 @@ namespace FarmaDual.Controllers
         {
             // Permitir crear el primer admin si no existe ninguno, o permitir a administradores crear más.
             var hasAdmin = db.UsuarioAuth.Any(u => u.Rol == "Admin" && u.Activo);
-            if (hasAdmin && !(User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin")))
+            if (hasAdmin && !(User != null && User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")))
                 return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
             ViewBag.TipoTarjetaId = new SelectList(
@@ -168,7 +168,7 @@ namespace FarmaDual.Controllers
         public ActionResult RegisterAdmin(RegisterVM vm)
         {
             var hasAdmin = db.UsuarioAuth.Any(u => u.Rol == "Admin" && u.Activo);
-            if (hasAdmin && !(User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin")))
+            if (hasAdmin && !(User != null && User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")))
                 return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
             ViewBag.TipoTarjetaId = new SelectList(
@@ -222,7 +222,7 @@ namespace FarmaDual.Controllers
             db.SaveChanges();
 
             // Si quien creó no está autenticado (creación del primer admin), autenticar al nuevo admin
-            if (!(User?.Identity?.IsAuthenticated == true))
+            if (!(User != null && User.Identity != null && User.Identity.IsAuthenticated))
                 FormsAuthentication.SetAuthCookie(vm.Correo, false);
 
             TempData["Success"] = "Administrador creado correctamente.";
