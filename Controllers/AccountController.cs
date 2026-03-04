@@ -35,10 +35,26 @@ namespace FarmaDual.Controllers
                 return true;
             }
 
-            if (!stored.StartsWith("AQAAAA", StringComparison.Ordinal))
+            try
+            {
+                return Crypto.VerifyHashedPassword(stored, plainPassword);
+            }
+            catch (FormatException)
+            {
                 return false;
+            }
+        }
 
-            return Crypto.VerifyHashedPassword(stored, plainPassword);
+        private bool IsDebugLoginEnabled()
+        {
+            var debugValue = Request != null ? Request["debug"] : null;
+            return string.Equals(debugValue, "1", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void AddLoginDebugStep(System.Collections.Generic.List<string> steps, string message)
+        {
+            if (steps != null)
+                steps.Add(string.Format("[{0:HH:mm:ss}] {1}", DateTime.Now, message));
         }
 
         private void SignInUser(string correo, string role, bool rememberMe)
@@ -243,29 +259,51 @@ namespace FarmaDual.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
 
-            // TEST: Return immediately to verify POST is working
-            return Content("TEST: POST recibido. Email: " + (vm?.Correo ?? "NULL"));
-        }
+            if (vm == null)
+                vm = new LoginVM();
 
-            if (!ModelState.IsValid) return View(vm);
+            var debugMode = IsDebugLoginEnabled();
+            ViewBag.DebugMode = debugMode;
+            var debugSteps = debugMode ? new System.Collections.Generic.List<string>() : null;
+            AddLoginDebugStep(debugSteps, "Inicio de POST /Account/Login.");
+
+            vm.Correo = NormalizeEmail(vm.Correo);
+            AddLoginDebugStep(debugSteps, "Correo normalizado: " + vm.Correo + ".");
+
+            if (!ModelState.IsValid)
+            {
+                AddLoginDebugStep(debugSteps, "ModelState invlido. Se devuelve la vista con errores.");
+                ViewBag.DebugLoginTrace = debugSteps;
+                return View(vm);
+            }
 
             var auth = db.UsuarioAuth.FirstOrDefault(x =>
                 x.Activo &&
                 x.Correo != null &&
                 x.Correo.Trim().ToLower() == vm.Correo);
+            AddLoginDebugStep(debugSteps, auth == null
+                ? "No se encontró usuario activo con ese correo."
+                : string.Format("Usuario encontrado. Rol={0}, Activo={1}.", auth.Rol, auth.Activo));
 
             if (!PasswordMatches(auth, vm.Password))
             {
+                AddLoginDebugStep(debugSteps, "PasswordMatches devolvió false.");
                 ModelState.AddModelError("", "Credenciales inválidas.");
+                ViewBag.DebugLoginTrace = debugSteps;
                 return View(vm);
             }
 
+            AddLoginDebugStep(debugSteps, "PasswordMatches devolvió true. Firmando usuario.");
             SignInUser(auth.Correo, auth.Rol, vm.RememberMe);
 
 
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                AddLoginDebugStep(debugSteps, "Redirección a returnUrl local: " + returnUrl + ".");
                 return Redirect(returnUrl);
+            }
 
+            AddLoginDebugStep(debugSteps, "Redirección por defecto a Medicamentos/Index.");
             return RedirectToAction("Index", "Medicamentos");
         }
 

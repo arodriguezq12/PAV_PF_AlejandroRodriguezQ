@@ -9,15 +9,7 @@
 
             <h3 class="mb-4">Iniciar sesión</h3>
 
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Error:</strong>
-                    @Html.ValidationSummary(false)
-                </div>
-            }
-
-            <form action="@Url.Action("Login", "Account")" method="post" id="loginForm">
+            <form id="loginForm" method="post" action="@Url.Action("Login", "Account", new { returnUrl = ViewBag.ReturnUrl })">
                 @Html.AntiForgeryToken()
                 @if (ViewBag.DebugMode == true)
                 {
@@ -65,19 +57,19 @@
                 }
 
                 <div class="mb-3">
-                    <label for="Correo" class="form-label">Correo</label>
-                    <input type="email" class="form-control" id="Correo" name="Correo" value="@Model.Correo" required placeholder="tu@email.com" />
-                    @Html.ValidationMessageFor(m => m.Correo, "", new { @class = "text-danger d-block mt-1" })
+                    @Html.LabelFor(m => m.Correo, new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Correo, new { @class = "form-control", type = "email", autocomplete = "username", spellcheck = "false" })
+                    @Html.ValidationMessageFor(m => m.Correo, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="mb-3">
-                    <label for="Password" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="Password" name="Password" required placeholder="Contraseña" />
-                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger d-block mt-1" })
+                    @Html.LabelFor(m => m.Password, new { @class = "form-label" })
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", autocomplete = "current-password" })
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="form-check mb-3">
-                    <input type="checkbox" class="form-check-input" id="RememberMe" name="RememberMe" />
+                    @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input", id = "RememberMe" })
                     <label class="form-check-label" for="RememberMe">Recordarme</label>
                 </div>
 
@@ -104,31 +96,29 @@
 
             if (!form || !button || !textNode) return;
 
+            var debugMode = @((ViewBag.DebugMode == true).ToString().ToLowerInvariant());
+
             var defaultText = 'Entrar';
             var loadingText = 'Validando...';
 
             function setButtonState(isLoading) {
                 button.disabled = isLoading;
-                button.querySelector('.btn-text').textContent = isLoading ? loadingText : defaultText;
+                textNode.textContent = isLoading ? loadingText : defaultText;
             }
 
-            form.addEventListener('submit', function () {
-                if (typeof form.checkValidity === 'function' && !form.checkValidity()) {
-                    setButtonState(false);
+            form.addEventListener('submit', function (event) {
+                if (button.disabled) {
+                    event.preventDefault();
                     return;
                 }
 
-                if (window.jQuery && typeof jQuery(form).valid === 'function' && !jQuery(form).valid()) {
-                    setButtonState(false);
-                    return;
-                }
-
+                if (debugMode) { console.log('[Login Debug] Submit detectado, enviando formulario.'); }
                 setButtonState(true);
             });
 
-            form.addEventListener('invalid', function () {
+            window.addEventListener('pageshow', function () {
                 setButtonState(false);
-            }, true);
+            });
         })();
     </script>
 }
