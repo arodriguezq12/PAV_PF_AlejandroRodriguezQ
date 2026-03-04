@@ -35,10 +35,24 @@
                             </ul>
                         }
                     </div>
+                }
 
-                    <div id="clientLoginTrace" class="alert alert-info small" role="alert">
-                        <strong>Debug Cliente (botón)</strong>
-                        <ul id="clientLoginTraceList" class="mb-0 ps-3"></ul>
+                @if (ViewBag.DebugMode == true)
+                {
+                    var trace = ViewBag.DebugLoginTrace as System.Collections.Generic.IEnumerable<string>;
+                    <div class="alert alert-warning small" role="alert">
+                        <strong>Debug Login Activo</strong>
+                        <div>Tip: desactiva quitando <code>?debug=1</code> de la URL.</div>
+                        @if (trace != null)
+                        {
+                            <hr class="my-2" />
+                            <ul class="mb-0 ps-3">
+                                @foreach (var step in trace)
+                                {
+                                    <li>@step</li>
+                                }
+                            </ul>
+                        }
                     </div>
                 }
 
@@ -79,47 +93,34 @@
             var form = document.getElementById('loginForm');
             var button = document.getElementById('btnEntrar');
             var textNode = button ? button.querySelector('.btn-text') : null;
-            var traceList = document.getElementById('clientLoginTraceList');
 
             if (!form || !button || !textNode) return;
-
-            var debugMode = @((ViewBag.DebugMode == true).ToString().ToLowerInvariant());
 
             var defaultText = 'Entrar';
             var loadingText = 'Validando...';
 
-            function addClientTrace(message) {
-                if (!debugMode || !traceList) return;
-
-                var li = document.createElement('li');
-                var time = new Date().toLocaleTimeString();
-                li.textContent = '[' + time + '] ' + message;
-                traceList.appendChild(li);
-            }
-
             function setButtonState(isLoading) {
                 button.disabled = isLoading;
-                textNode.textContent = isLoading ? loadingText : defaultText;
+                button.querySelector('.btn-text').textContent = isLoading ? loadingText : defaultText;
             }
 
-            form.addEventListener('submit', function (event) {
-                addClientTrace('A) Evento submit detectado.');
-                if (button.disabled) {
-                    addClientTrace('B) Submit bloqueado: botón ya estaba deshabilitado.');
-                    event.preventDefault();
+            form.addEventListener('submit', function () {
+                if (typeof form.checkValidity === 'function' && !form.checkValidity()) {
+                    setButtonState(false);
                     return;
                 }
 
-                addClientTrace('C) Botón habilitado, se marca estado Validando...');
-                if (debugMode) { console.log('[Login Debug] Submit detectado, enviando formulario.'); }
+                if (window.jQuery && typeof jQuery(form).valid === 'function' && !jQuery(form).valid()) {
+                    setButtonState(false);
+                    return;
+                }
+
                 setButtonState(true);
-                addClientTrace('D) Formulario enviado al servidor.');
             });
 
-            window.addEventListener('pageshow', function () {
+            form.addEventListener('invalid', function () {
                 setButtonState(false);
-                addClientTrace('E) pageshow: botón restablecido a estado inicial.');
-            });
+            }, true);
         })();
     </script>
 }
