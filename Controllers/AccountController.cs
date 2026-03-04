@@ -35,14 +35,10 @@ namespace FarmaDual.Controllers
                 return true;
             }
 
-            try
-            {
-                return Crypto.VerifyHashedPassword(stored, plainPassword);
-            }
-            catch (FormatException)
-            {
+            if (!stored.StartsWith("AQAAAA", StringComparison.Ordinal))
                 return false;
-            }
+
+            return Crypto.VerifyHashedPassword(stored, plainPassword);
         }
 
         private void SignInUser(string correo, string role, bool rememberMe)
