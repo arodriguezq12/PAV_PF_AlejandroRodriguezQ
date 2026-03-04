@@ -9,11 +9,33 @@
 
             <h3 class="mb-4">Iniciar sesión</h3>
 
-            @using (Html.BeginForm("Login", "Account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { id = "loginForm" }))
-            {
+            <form id="loginForm" method="post" action="@Url.Action("Login", "Account", new { returnUrl = ViewBag.ReturnUrl })">
                 @Html.AntiForgeryToken()
+                @if (ViewBag.DebugMode == true)
+                {
+                    <input type="hidden" name="debug" value="1" />
+                }
 
                 @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+                @if (ViewBag.DebugMode == true)
+                {
+                    var trace = ViewBag.DebugLoginTrace as System.Collections.Generic.IEnumerable<string>;
+                    <div class="alert alert-warning small" role="alert">
+                        <strong>Debug Login Activo</strong>
+                        <div>Tip: desactiva quitando <code>?debug=1</code> de la URL.</div>
+                        @if (trace != null)
+                        {
+                            <hr class="my-2" />
+                            <ul class="mb-0 ps-3">
+                                @foreach (var step in trace)
+                                {
+                                    <li>@step</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                }
 
                 <div class="mb-3">
                     @Html.LabelFor(m => m.Correo, new { @class = "form-label" })
@@ -35,7 +57,7 @@
                 <button type="submit" id="btnEntrar" class="btn btn-primary w-100">
                     <span class="btn-text">Entrar</span>
                 </button>
-            }
+            </form>
 
             <div class="mt-3 text-center">
                 @Html.ActionLink("No tengo cuenta → Registrarme", "Register", "Account", null, null)
@@ -51,12 +73,32 @@
         (function () {
             var form = document.getElementById('loginForm');
             var button = document.getElementById('btnEntrar');
+            var textNode = button ? button.querySelector('.btn-text') : null;
 
-            if (!form || !button) return;
+            if (!form || !button || !textNode) return;
 
-            form.addEventListener('submit', function () {
-                button.disabled = true;
-                button.querySelector('.btn-text').textContent = 'Validando...';
+            var debugMode = @((ViewBag.DebugMode == true).ToString().ToLowerInvariant());
+
+            var defaultText = 'Entrar';
+            var loadingText = 'Validando...';
+
+            function setButtonState(isLoading) {
+                button.disabled = isLoading;
+                textNode.textContent = isLoading ? loadingText : defaultText;
+            }
+
+            form.addEventListener('submit', function (event) {
+                if (button.disabled) {
+                    event.preventDefault();
+                    return;
+                }
+
+                if (debugMode) { console.log('[Login Debug] Submit detectado, enviando formulario.'); }
+                setButtonState(true);
+            });
+
+            window.addEventListener('pageshow', function () {
+                setButtonState(false);
             });
         })();
     </script>
