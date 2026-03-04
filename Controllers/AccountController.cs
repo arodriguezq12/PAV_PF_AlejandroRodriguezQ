@@ -19,6 +19,44 @@ namespace FarmaDual.Controllers
             return (email ?? string.Empty).Trim().ToLowerInvariant();
         }
 
+
+        private bool PasswordMatches(UsuarioAuth auth, string plainPassword)
+        {
+            if (auth == null || string.IsNullOrEmpty(plainPassword))
+                return false;
+
+            var stored = auth.PasswordHash ?? string.Empty;
+
+            // Compatibilidad con cuentas legacy que pudieron guardarse en texto plano.
+            if (string.Equals(stored, plainPassword, StringComparison.Ordinal))
+            {
+                auth.PasswordHash = Crypto.HashPassword(plainPassword);
+                db.SaveChanges();
+                return true;
+            }
+
+            try
+            {
+                return Crypto.VerifyHashedPassword(stored, plainPassword);
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+
+        private bool IsDebugLoginEnabled()
+        {
+            var debugValue = Request != null ? Request["debug"] : null;
+            return string.Equals(debugValue, "1", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void AddLoginDebugStep(System.Collections.Generic.List<string> steps, string message)
+        {
+            if (steps != null)
+                steps.Add(string.Format("[{0:HH:mm:ss}] {1}", DateTime.Now, message));
+        }
+
         private void SignInUser(string correo, string role, bool rememberMe)
         {
             var ticket = new FormsAuthenticationTicket(
@@ -129,7 +167,7 @@ namespace FarmaDual.Controllers
         {
             // Permitir crear el primer admin si no existe ninguno, o permitir a administradores crear más.
             var hasAdmin = db.UsuarioAuth.Any(u => u.Rol == "Admin" && u.Activo);
-            if (hasAdmin && !(User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin")))
+            if (hasAdmin && !(User != null && User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")))
                 return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
             ViewBag.TipoTarjetaId = new SelectList(
@@ -146,7 +184,7 @@ namespace FarmaDual.Controllers
         public ActionResult RegisterAdmin(RegisterVM vm)
         {
             var hasAdmin = db.UsuarioAuth.Any(u => u.Rol == "Admin" && u.Activo);
-            if (hasAdmin && !(User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin")))
+            if (hasAdmin && !(User != null && User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")))
                 return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
             ViewBag.TipoTarjetaId = new SelectList(
@@ -200,7 +238,7 @@ namespace FarmaDual.Controllers
             db.SaveChanges();
 
             // Si quien creó no está autenticado (creación del primer admin), autenticar al nuevo admin
-            if (!(User?.Identity?.IsAuthenticated == true))
+            if (!(User != null && User.Identity != null && User.Identity.IsAuthenticated))
                 FormsAuthentication.SetAuthCookie(vm.Correo, false);
 
             TempData["Success"] = "Administrador creado correctamente.";
@@ -211,6 +249,7 @@ namespace FarmaDual.Controllers
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
+            ViewBag.DebugMode = IsDebugLoginEnabled();
             return View(new LoginVM());
         }
 
@@ -220,24 +259,51 @@ namespace FarmaDual.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
 
+            if (vm == null)
+                vm = new LoginVM();
+
+            var debugMode = IsDebugLoginEnabled();
+            ViewBag.DebugMode = debugMode;
+            var debugSteps = debugMode ? new System.Collections.Generic.List<string>() : null;
+            AddLoginDebugStep(debugSteps, "Inicio de POST /Account/Login.");
+
             vm.Correo = NormalizeEmail(vm.Correo);
+            AddLoginDebugStep(debugSteps, "Correo normalizado: " + vm.Correo + ".");
 
-            if (!ModelState.IsValid) return View(vm);
-
-            var auth = db.UsuarioAuth.FirstOrDefault(x => x.Correo.ToLower() == vm.Correo && x.Activo);
-
-            if (auth == null || !Crypto.VerifyHashedPassword(auth.PasswordHash, vm.Password))
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("", "Credenciales inválidas.");
+                AddLoginDebugStep(debugSteps, "ModelState inválido. Se devuelve la vista con errores.");
+                ViewBag.DebugLoginTrace = debugSteps;
                 return View(vm);
             }
 
+            var auth = db.UsuarioAuth.FirstOrDefault(x =>
+                x.Activo &&
+                x.Correo != null &&
+                x.Correo.Trim().ToLower() == vm.Correo);
+            AddLoginDebugStep(debugSteps, auth == null
+                ? "No se encontró usuario activo con ese correo."
+                : string.Format("Usuario encontrado. Rol={0}, Activo={1}.", auth.Rol, auth.Activo));
+
+            if (!PasswordMatches(auth, vm.Password))
+            {
+                AddLoginDebugStep(debugSteps, "PasswordMatches devolvió false.");
+                ModelState.AddModelError("", "Credenciales inválidas.");
+                ViewBag.DebugLoginTrace = debugSteps;
+                return View(vm);
+            }
+
+            AddLoginDebugStep(debugSteps, "PasswordMatches devolvió true. Firmando usuario.");
             SignInUser(auth.Correo, auth.Rol, vm.RememberMe);
 
 
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                AddLoginDebugStep(debugSteps, "Redirección a returnUrl local: " + returnUrl + ".");
                 return Redirect(returnUrl);
+            }
 
+            AddLoginDebugStep(debugSteps, "Redirección por defecto a Medicamentos/Index.");
             return RedirectToAction("Index", "Medicamentos");
         }
 
