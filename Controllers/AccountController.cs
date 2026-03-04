@@ -35,26 +35,10 @@ namespace FarmaDual.Controllers
                 return true;
             }
 
-            try
-            {
-                return Crypto.VerifyHashedPassword(stored, plainPassword);
-            }
-            catch (FormatException)
-            {
+            if (!stored.StartsWith("AQAAAA", StringComparison.Ordinal))
                 return false;
-            }
-        }
 
-        private bool IsDebugLoginEnabled()
-        {
-            var debugValue = Request != null ? Request["debug"] : null;
-            return string.Equals(debugValue, "1", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private void AddLoginDebugStep(System.Collections.Generic.List<string> steps, string message)
-        {
-            if (steps != null)
-                steps.Add(string.Format("[{0:HH:mm:ss}] {1}", DateTime.Now, message));
+            return Crypto.VerifyHashedPassword(stored, plainPassword);
         }
 
         private void SignInUser(string correo, string role, bool rememberMe)
@@ -259,16 +243,13 @@ namespace FarmaDual.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
 
-            if (vm == null)
-                vm = new LoginVM();
-
             var debugMode = IsDebugLoginEnabled();
             ViewBag.DebugMode = debugMode;
             var debugSteps = debugMode ? new System.Collections.Generic.List<string>() : null;
             AddLoginDebugStep(debugSteps, "Inicio de POST /Account/Login.");
 
             vm.Correo = NormalizeEmail(vm.Correo);
-            AddLoginDebugStep(debugSteps, "Correo normalizado: " + vm.Correo + ".");
+            AddLoginDebugStep(debugSteps, $"Correo normalizado: {vm.Correo}.");
 
             if (!ModelState.IsValid)
             {
@@ -281,9 +262,6 @@ namespace FarmaDual.Controllers
                 x.Activo &&
                 x.Correo != null &&
                 x.Correo.Trim().ToLower() == vm.Correo);
-            AddLoginDebugStep(debugSteps, auth == null
-                ? "No se encontró usuario activo con ese correo."
-                : string.Format("Usuario encontrado. Rol={0}, Activo={1}.", auth.Rol, auth.Activo));
 
             if (!PasswordMatches(auth, vm.Password))
             {
@@ -299,7 +277,7 @@ namespace FarmaDual.Controllers
 
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
-                AddLoginDebugStep(debugSteps, "Redirección a returnUrl local: " + returnUrl + ".");
+                AddLoginDebugStep(debugSteps, $"Redirección a returnUrl local: {returnUrl}.");
                 return Redirect(returnUrl);
             }
 
