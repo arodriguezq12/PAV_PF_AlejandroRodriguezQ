@@ -35,25 +35,10 @@ namespace FarmaDual.Controllers
                 return true;
             }
 
-            try
-            {
-                return Crypto.VerifyHashedPassword(stored, plainPassword);
-            }
-            catch (FormatException)
-            {
+            if (!stored.StartsWith("AQAAAA", StringComparison.Ordinal))
                 return false;
-            }
-        }
 
-        private bool IsDebugLoginEnabled()
-        {
-            return string.Equals(Request?["debug"], "1", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private void AddLoginDebugStep(System.Collections.Generic.List<string> steps, string message)
-        {
-            if (steps != null)
-                steps.Add($"[{DateTime.Now:HH:mm:ss}] {message}");
+            return Crypto.VerifyHashedPassword(stored, plainPassword);
         }
 
         private void SignInUser(string correo, string role, bool rememberMe)
@@ -277,9 +262,6 @@ namespace FarmaDual.Controllers
                 x.Activo &&
                 x.Correo != null &&
                 x.Correo.Trim().ToLower() == vm.Correo);
-            AddLoginDebugStep(debugSteps, auth == null
-                ? "No se encontró usuario activo con ese correo."
-                : $"Usuario encontrado. Rol={auth.Rol}, Activo={auth.Activo}.");
 
             if (!PasswordMatches(auth, vm.Password))
             {

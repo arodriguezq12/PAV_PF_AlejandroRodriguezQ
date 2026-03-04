@@ -77,29 +77,31 @@
 
             if (!form || !button || !textNode) return;
 
-            var debugMode = @((ViewBag.DebugMode == true).ToString().ToLowerInvariant());
-
             var defaultText = 'Entrar';
             var loadingText = 'Validando...';
 
             function setButtonState(isLoading) {
                 button.disabled = isLoading;
-                textNode.textContent = isLoading ? loadingText : defaultText;
+                button.querySelector('.btn-text').textContent = isLoading ? loadingText : defaultText;
             }
 
-            form.addEventListener('submit', function (event) {
-                if (button.disabled) {
-                    event.preventDefault();
+            form.addEventListener('submit', function () {
+                if (typeof form.checkValidity === 'function' && !form.checkValidity()) {
+                    setButtonState(false);
                     return;
                 }
 
-                if (debugMode) { console.log('[Login Debug] Submit detectado, enviando formulario.'); }
+                if (window.jQuery && typeof jQuery(form).valid === 'function' && !jQuery(form).valid()) {
+                    setButtonState(false);
+                    return;
+                }
+
                 setButtonState(true);
             });
 
-            window.addEventListener('pageshow', function () {
+            form.addEventListener('invalid', function () {
                 setButtonState(false);
-            });
+            }, true);
         })();
     </script>
 }
