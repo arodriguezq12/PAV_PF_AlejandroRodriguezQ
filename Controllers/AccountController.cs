@@ -19,6 +19,28 @@ namespace FarmaDual.Controllers
             return (email ?? string.Empty).Trim().ToLowerInvariant();
         }
 
+
+        private bool PasswordMatches(UsuarioAuth auth, string plainPassword)
+        {
+            if (auth == null || string.IsNullOrEmpty(plainPassword))
+                return false;
+
+            var stored = auth.PasswordHash ?? string.Empty;
+
+            // Compatibilidad con cuentas legacy que pudieron guardarse en texto plano.
+            if (string.Equals(stored, plainPassword, StringComparison.Ordinal))
+            {
+                auth.PasswordHash = Crypto.HashPassword(plainPassword);
+                db.SaveChanges();
+                return true;
+            }
+
+            if (!stored.StartsWith("AQAAAA", StringComparison.Ordinal))
+                return false;
+
+            return Crypto.VerifyHashedPassword(stored, plainPassword);
+        }
+
         private void SignInUser(string correo, string role, bool rememberMe)
         {
             var ticket = new FormsAuthenticationTicket(
@@ -224,9 +246,12 @@ namespace FarmaDual.Controllers
 
             if (!ModelState.IsValid) return View(vm);
 
-            var auth = db.UsuarioAuth.FirstOrDefault(x => x.Correo.ToLower() == vm.Correo && x.Activo);
+            var auth = db.UsuarioAuth.FirstOrDefault(x =>
+                x.Activo &&
+                x.Correo != null &&
+                x.Correo.Trim().ToLower() == vm.Correo);
 
-            if (auth == null || !Crypto.VerifyHashedPassword(auth.PasswordHash, vm.Password))
+            if (!PasswordMatches(auth, vm.Password))
             {
                 ModelState.AddModelError("", "Credenciales inválidas.");
                 return View(vm);
