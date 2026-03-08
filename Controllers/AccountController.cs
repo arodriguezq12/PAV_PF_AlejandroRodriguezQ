@@ -268,6 +268,8 @@ namespace FarmaDual.Controllers
             AddLoginDebugStep(debugSteps, "Inicio de POST /Account/Login.");
 
             vm.Correo = NormalizeEmail(vm.Correo);
+            ModelState.Remove("Correo");
+            TryValidateModel(vm);
             AddLoginDebugStep(debugSteps, "Correo normalizado: " + vm.Correo + ".");
 
             if (!ModelState.IsValid)
