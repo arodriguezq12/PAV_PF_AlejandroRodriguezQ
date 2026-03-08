@@ -37,25 +37,6 @@
                     </div>
                 }
 
-                @if (ViewBag.DebugMode == true)
-                {
-                    var trace = ViewBag.DebugLoginTrace as System.Collections.Generic.IEnumerable<string>;
-                    <div class="alert alert-warning small" role="alert">
-                        <strong>Debug Login Activo</strong>
-                        <div>Tip: desactiva quitando <code>?debug=1</code> de la URL.</div>
-                        @if (trace != null)
-                        {
-                            <hr class="my-2" />
-                            <ul class="mb-0 ps-3">
-                                @foreach (var step in trace)
-                                {
-                                    <li>@step</li>
-                                }
-                            </ul>
-                        }
-                    </div>
-                }
-
                 <div class="mb-3">
                     @Html.LabelFor(m => m.Correo, new { @class = "form-label" })
                     @Html.TextBoxFor(m => m.Correo, new { @class = "form-control", type = "email", autocomplete = "username", spellcheck = "false" })
@@ -97,6 +78,7 @@
             if (!form || !button || !textNode) return;
 
             var debugMode = @((ViewBag.DebugMode == true).ToString().ToLowerInvariant());
+            var correoInput = document.getElementById('Correo');
 
             var defaultText = 'Entrar';
             var loadingText = 'Validando...';
@@ -110,6 +92,10 @@
                 if (button.disabled) {
                     event.preventDefault();
                     return;
+                }
+
+                if (correoInput && typeof correoInput.value === 'string') {
+                    correoInput.value = correoInput.value.trim();
                 }
 
                 if (debugMode) { console.log('[Login Debug] Submit detectado, enviando formulario.'); }
