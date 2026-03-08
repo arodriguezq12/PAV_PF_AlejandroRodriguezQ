@@ -57,6 +57,26 @@ namespace FarmaDual.Controllers
                 steps.Add(string.Format("[{0:HH:mm:ss}] {1}", DateTime.Now, message));
         }
 
+
+        private string SanitizeReturnUrl(string returnUrl)
+        {
+            if (string.IsNullOrWhiteSpace(returnUrl) || !Url.IsLocalUrl(returnUrl))
+                return null;
+
+            var pathOnly = returnUrl.Split('?')[0].Trim();
+            if (string.IsNullOrWhiteSpace(pathOnly))
+                return null;
+
+            if (string.Equals(pathOnly, "/", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(pathOnly, "/Account/Login", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(pathOnly, "/Account/Login/", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            return returnUrl;
+        }
+
         private void SignInUser(string correo, string role, bool rememberMe)
         {
             var ticket = new FormsAuthenticationTicket(
@@ -248,6 +268,7 @@ namespace FarmaDual.Controllers
         [HttpGet]
         public ActionResult Login(string returnUrl)
         {
+            returnUrl = SanitizeReturnUrl(returnUrl);
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.DebugMode = IsDebugLoginEnabled();
             return View(new LoginVM());
@@ -257,6 +278,7 @@ namespace FarmaDual.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginVM vm, string returnUrl)
         {
+            returnUrl = SanitizeReturnUrl(returnUrl);
             ViewBag.ReturnUrl = returnUrl;
 
             if (vm == null)
