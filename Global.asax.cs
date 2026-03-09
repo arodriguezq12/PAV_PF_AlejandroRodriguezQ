@@ -20,7 +20,25 @@ namespace PAV_PF_AlejandroRodriguezQ
 
             AntiForgeryConfig.UniqueClaimTypeIdentifier = "name";
         }
+        protected void Application_AuthenticateRequest(object sender, EventArgs e)
+        {
+            var authCookie = Context.Request.Cookies[FormsAuthentication.FormsCookieName];
 
+            if (authCookie != null)
+            {
+                var authTicket = FormsAuthentication.Decrypt(authCookie.Value);
+
+                if (authTicket != null && !authTicket.Expired)
+                {
+                    var roles = authTicket.UserData.Split(',');
+
+                    Context.User = new System.Security.Principal.GenericPrincipal(
+                        new System.Security.Principal.GenericIdentity(authTicket.Name),
+                        roles
+                    );
+                }
+            }
+        }
         protected void Application_PostAuthenticateRequest(object sender, EventArgs e)
         {
             var authCookie = Request.Cookies[FormsAuthentication.FormsCookieName];

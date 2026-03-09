@@ -268,7 +268,7 @@ namespace FarmaDual.Controllers
         [HttpGet]
         public ActionResult Login(string returnUrl, string ReturnUrl)
         {
-            returnUrl = SanitizeReturnUrl(string.IsNullOrWhiteSpace(returnUrl) ? ReturnUrl : returnUrl);
+            returnUrl = SanitizeReturnUrl(returnUrl);
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.DebugMode = IsDebugLoginEnabled();
             return View(new LoginVM());
@@ -278,7 +278,7 @@ namespace FarmaDual.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginVM vm, string returnUrl, string ReturnUrl)
         {
-            returnUrl = SanitizeReturnUrl(string.IsNullOrWhiteSpace(returnUrl) ? ReturnUrl : returnUrl);
+            returnUrl = SanitizeReturnUrl(returnUrl);
             ViewBag.ReturnUrl = returnUrl;
 
             if (vm == null)
