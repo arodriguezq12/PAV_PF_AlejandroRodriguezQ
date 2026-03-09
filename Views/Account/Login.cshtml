@@ -9,13 +9,13 @@
 
             <h3 class="mb-4">Iniciar sesión</h3>
 
-            <form id="loginForm" method="post" action="@Url.Action("Login", "Account")">
+            @using (Html.BeginForm("Login", "Account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { id = "loginForm", novalidate = "novalidate" }))
+            {
                 @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(false, "", new { @class = "text-danger mb-3" })
+
                 @if (ViewBag.DebugMode == true)
-                {
-                    <input type="hidden" name="debug" value="1" />
-                }
-                @if (!string.IsNullOrWhiteSpace(ViewBag.ReturnUrl as string))
                 {
                     <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
                 }
@@ -58,10 +58,10 @@
                 <button type="submit" id="btnEntrar" class="btn btn-primary w-100">
                     <span class="btn-text">Entrar</span>
                 </button>
-            </form>
+            }
 
             <div class="mt-3 text-center">
-                @Html.ActionLink("No tengo cuenta → Registrarme", "Register", "Account", null, null)
+                @Html.ActionLink("No tengo cuenta → Registrarme", "Register", "Account")
             </div>
 
         </div>
@@ -89,10 +89,14 @@
                 textNode.textContent = isLoading ? loadingText : defaultText;
             }
 
-            form.addEventListener('submit', function (event) {
-                if (button.disabled) {
-                    event.preventDefault();
-                    return;
+            form.addEventListener('submit', function () {
+                // 1) Si jQuery validate está activo y el form es inválido, NO bloquear el botón
+                if (window.jQuery && jQuery(form).data('validator')) {
+                    if (!jQuery(form).valid()) return;
+                }
+
+                if (correoInput && typeof correoInput.value === 'string') {
+                    correoInput.value = correoInput.value.trim();
                 }
 
                 if (correoInput && typeof correoInput.value === 'string') {

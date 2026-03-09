@@ -79,7 +79,19 @@
                     }
                 </div>
 
-                @{ Html.RenderAction("UserNav", "Profile"); }
+                @{
+                    var ctrl = (ViewContext.RouteData.Values["controller"] ?? "").ToString();
+                    var act = (ViewContext.RouteData.Values["action"] ?? "").ToString();
+                    var isAccountAuthViews = ctrl.Equals("Account", StringComparison.OrdinalIgnoreCase)
+                                          && (act.Equals("Login", StringComparison.OrdinalIgnoreCase)
+                                           || act.Equals("Register", StringComparison.OrdinalIgnoreCase)
+                                           || act.Equals("RegisterAdmin", StringComparison.OrdinalIgnoreCase));
+
+                    if (!isAccountAuthViews)
+                    {
+                        Html.RenderAction("UserNav", "Profile");
+                    }
+                }
             </div>
         </div>
     </nav>
