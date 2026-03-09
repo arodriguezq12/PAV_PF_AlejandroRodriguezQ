@@ -266,7 +266,7 @@ namespace FarmaDual.Controllers
         }
 
         [HttpGet]
-        public ActionResult Login(string returnUrl)
+        public ActionResult Login(string returnUrl, string ReturnUrl)
         {
             returnUrl = SanitizeReturnUrl(returnUrl);
             ViewBag.ReturnUrl = returnUrl;
@@ -276,7 +276,7 @@ namespace FarmaDual.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Login(LoginVM vm, string returnUrl)
+        public ActionResult Login(LoginVM vm, string returnUrl, string ReturnUrl)
         {
             returnUrl = SanitizeReturnUrl(returnUrl);
             ViewBag.ReturnUrl = returnUrl;
