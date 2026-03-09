@@ -9,33 +9,18 @@
 
             <h3 class="mb-4">Iniciar sesión</h3>
 
-            <form id="loginForm" method="post" action="@Url.Action("Login", "Account", new { returnUrl = ViewBag.ReturnUrl })">
+            <form id="loginForm" method="post" action="@Url.Action("Login", "Account")">
                 @Html.AntiForgeryToken()
                 @if (ViewBag.DebugMode == true)
                 {
                     <input type="hidden" name="debug" value="1" />
                 }
+                @if (!string.IsNullOrWhiteSpace(ViewBag.ReturnUrl as string))
+                {
+                    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                }
 
                 @Html.ValidationSummary(false, "", new { @class = "text-danger mb-3" })
-
-                @if (ViewBag.DebugMode == true)
-                {
-                    var trace = ViewBag.DebugLoginTrace as System.Collections.Generic.IEnumerable<string>;
-                    <div class="alert alert-warning small" role="alert">
-                        <strong>Debug Login Activo</strong>
-                        <div>Tip: desactiva quitando <code>?debug=1</code> de la URL.</div>
-                        @if (trace != null)
-                        {
-                            <hr class="my-2" />
-                            <ul class="mb-0 ps-3">
-                                @foreach (var step in trace)
-                                {
-                                    <li>@step</li>
-                                }
-                            </ul>
-                        }
-                    </div>
-                }
 
                 @if (ViewBag.DebugMode == true)
                 {
@@ -97,6 +82,7 @@
             if (!form || !button || !textNode) return;
 
             var debugMode = @((ViewBag.DebugMode == true).ToString().ToLowerInvariant());
+            var correoInput = document.getElementById('Correo');
 
             var defaultText = 'Entrar';
             var loadingText = 'Validando...';
@@ -110,6 +96,10 @@
                 if (button.disabled) {
                     event.preventDefault();
                     return;
+                }
+
+                if (correoInput && typeof correoInput.value === 'string') {
+                    correoInput.value = correoInput.value.trim();
                 }
 
                 if (debugMode) { console.log('[Login Debug] Submit detectado, enviando formulario.'); }
